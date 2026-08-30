@@ -1,0 +1,127 @@
+Well, I am talking about .MSK files used in the semiconductor field.
+I am currently working with Microwind, and here's an example MSK file that's actually empty:
+VERSION 8/30/2026 7:03:17 AM
+FIG #C:\Users\adeij\Desktop\ex.MSK
+BB(-15,-15,50,50)
+SIMU #2.50
+ZOOM(-25,-20,55,55)
+FFIG C:\Users\adeij\Desktop\ex.MSK
+
+
+
+The following msk file is for an empty design, but I've added a 41x29 lambda rectangle of metal1:
+VERSION 8/30/2026 7:05:52 AM
+FIG #C:\Users\adeij\Desktop\ex.MSK
+BB(20,8,61,37)
+SIMU #2.50
+ZOOM(-25,-20,55,55)
+REC(20,8,41,29,ME)
+FFIG C:\Users\adeij\Desktop\ex.MSK
+
+
+
+
+I've added another metal layer of size 28x33:
+VERSION 8/30/2026 7:07:06 AM
+FIG #C:\Users\adeij\Desktop\ex.MSK
+BB(20,6,97,39)
+SIMU #2.50
+ZOOM(-25,-20,55,55)
+REC(20,8,41,29,ME)
+REC(69,6,28,33,M2)
+FFIG C:\Users\adeij\Desktop\ex.MSK
+
+
+okay super cool, now let's learn about vias; the following msk file contains nothing but a connection between metal 1 and 2:
+VERSION 8/30/2026 7:18:17 AM
+FIG #C:\Users\adeij\Desktop\ex.MSK
+BB(33,20,37,24)
+SIMU #2.50
+ZOOM(-25,-20,55,55)
+REC(33,20,4,4,M2)
+REC(33,20,4,4,ME)
+REC(34,21,2,2,VI)
+FFIG C:\Users\adeij\Desktop\ex.MSK
+
+
+Now I've added a 74x7 lambda strip of each of ME, M2, M3, and M4, and made a single connection between them, here's the resulting MSK file:
+VERSION 8/30/2026 7:21:02 AM
+FIG #C:\Users\adeij\Desktop\ex.MSK
+BB(3,17,77,24)
+SIMU #2.50
+ZOOM(-25,-20,55,55)
+REC(3,17,74,7,ME)
+REC(3,17,74,7,M2)
+REC(3,17,74,7,M3)
+REC(3,17,74,7,M4)
+REC(37,20,2,2,VI)
+REC(36,19,4,4,ME)
+REC(36,19,4,4,M2)
+REC(37,20,2,2,V2)
+REC(36,19,4,4,M2)
+REC(36,19,4,4,M3)
+REC(37,20,2,2,V3)
+REC(36,19,4,4,M3)
+REC(36,19,4,4,M4)
+FFIG C:\Users\adeij\Desktop\ex.MSK
+
+
+Now let's talk about power grids, I've been taught that a powergrid is made out of columns and rows of metals, odd metals in vertical (M1, M3, ...), and even metals are horizontal (M2, M4, ...), and that a power grid is specified by:
+
+* The metals that make it up.
+* The count of columns.
+* The count of rows.
+* The width of each metal layer, this is given for the metal layer generally regardless of its position, and regardless if we're talking about a row or a column.
+* The row-to-row spacing.
+* The column-to-column spacing.
+* The voltage pattern (e.g.: VDD, VSS, VDD, VSS, ..., or VDD FLOAT VSS FLOAT VDD FLOAT VSS ..., or whatever else), and based on this pattern, ONLY VDD and VSS are connected via vias at the column-row intersections.
+
+
+Let's assume for now that the power grid's pattern is the same for the rows and columns, i.e.: if the rows are: VDD, VSS, VDD, VSS, ..., then the columns will be the same.
+Now lemme teach you the last thing - how to add VDD and VSS:
+I've added three metal 1 strips (horizontal, just for the sake of this example, otherwise these are only meant for vertical metal paths), the first at the top is connected to VDD in the middle by a net name thingy, the second from the top is connected to VDD from the right, and lastly, the third from the top is connected to VSS from the left:
+VERSION 8/30/2026 7:30:28 AM
+FIG #C:\Users\adeij\Desktop\ex.MSK
+BB(6,1,79,35)
+SIMU #2.50
+ZOOM(-25,-20,55,55)
+REC(6,15,73,9,ME)
+REC(6,1,73,9,ME)
+REC(6,27,73,8,ME)
+TITLE 75 19  #Vdd
+$1 1000 0 
+TITLE 9 5  #Vss
+$0 1000 0 
+TITLE 42 31  #Vdd
+$1 1000 0 
+FFIG C:\Users\adeij\Desktop\ex.MSK
+
+
+
+Please write all your findings to a markdown file nicely for the next claude session, make it detailed, and verify your info, don't make stuff up
+
+
+
+I want you to write a python script that creates a .MSK file similar to what I've shown you but it has a structured power grid.
+The script has the following inputs:
+
+* a json file with parameters regarding each metal layer (metal 1 upto metal 6), the json parameters will be:
+   * will the metal layer be used in the powergrid?
+   * what is the width of the metal layer?
+* The count of columns.
+* The count of rows.
+* The row-to-row spacing.
+* The column-to-column spacing.
+* The voltage pattern (e.g.: VDD, VSS, VDD, VSS, ..., or VDD FLOAT VSS FLOAT VDD FLOAT VSS ..., or whatever else), and based on this pattern, ONLY VDD and VSS are connected via vias at the column-row intersections.
+
+the script will have the following output: a corresponding MSK file as per our findings that fulfils the given input.
+
+
+
+
+AWESOME WORK! YOU NAILED IT, LITERALLY (lol)!
+But here are some problems we must fix:
+
+* I want everything in the json file, rename the json file to `config.json`, where it contains the information about the layers, column count, and everything else you made me pass as a parameter you evil claude (jk i love u).
+* I forgot to tell you that for a powergrid, we like to leave a bit of each metal row/column hanging off at each end; i.e.: the rows have LEFT and RIGHT hanging edges that extend over `hanging_edge_length` specified in `config.json`, and the columns have BOTTOM AND TOP hanging edges that extend over the same length.
+* I don't like where you're placing the net names for VDD and VSS, don't get me wrong, you placed them well; as there are no shorts, but the position is not nice, I want them at the LEFT/BOTTOM hanging edges of the rows and columns.

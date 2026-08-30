@@ -1,0 +1,40 @@
+{
+  "layers": {
+    "metal1": {
+      "used": true,
+      "width": 4
+    },
+    "metal2": {
+      "used": true,
+      "width": 4
+    },
+    "metal3": {
+      "used": true,
+      "width": 4
+    },
+    "metal4": {
+      "used": true,
+      "width": 6
+    },
+    "metal5": {
+      "used": false,
+      "width": 4
+    },
+    "metal6": {
+      "used": false,
+      "width": 4
+    }
+  },
+  "columns": 4,
+  "rows": 3,
+  "column_spacing": 20,
+  "row_spacing": 20,
+  "voltage_pattern": [
+    "VDD",
+    "VSS"
+  ],
+  "hanging_edge_length": 3,
+  "output": "example_power_grid.MSK",
+  "sim_value": 2.5,
+  "label_nets": true
+}
